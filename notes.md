@@ -116,3 +116,78 @@
 - $(A \otimes B) (C \otimes D) = (A C) \otimes (B D)$
 - "floating scalar rule": $(\alpha A) \otimes B = A \otimes (\alpha B) = \alpha (A \otimes B)$
 - $\left \vert \psi \right \rangle \cdot \left \langle \varphi \right \vert \cdot \left \vert \gamma \right \rangle = \left \vert \psi \right \rangle \cdot \mleft \langle \varphi \middle \vert \gamma \mright \rangle = \mleft \langle \varphi \middle \vert \gamma \mright \rangle \cdot \left \vert \psi \right \rangle$
+
+# 10.4 2t
+
+- todo: wire drawing
+- $\left \vert 0 \right \rangle \otimes \left \vert 0 \right \rangle \otimes \left \vert 0 \right \rangle = \left \vert 000 \right \rangle$
+- $\left ( I \otimes CNOT \right ) \left ( I \otimes X \otimes I \right ) \left ( H \otimes I \otimes I \right ) \underbrace{\left \vert 000 \right \rangle}_\text{vector}$
+- it is more error-prone to do $I$ than $X$ or $H$
+  - qiskit etc will put single operations that cancel out instead
+
+- todo: drawing - cnot but ctrl qbit on top
+- $(I \otimes S) (CNOT \otimes I) (I \otimes S) \left \vert 000 \right \rangle$
+  - where $S$ is swap
+
+- bob creates $\frac{1}{\sqrt 2} \left ( \left \vert 00 \right \rangle + \left \vert 11 \right \rangle \right )$ and sends one of the qubits to alice
+- alice has 2 bits $a b$
+  - if $a = 1$, alice applies $Z$ to $A$
+    - $Z = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}$
+  - if $b = 1$, alice applies $X$ to $A$
+  - send $A$ to bob
+- bob
+  - $CNOT(A, B)$
+  - apply $H$ to $A$
+  - measure $A, B$
+
+| $ab$ | alice 1 | alice 2 | bob 1 | bob 2 | bob measure |
+| :-:  | :-:     | :-:     | :-:   | :-:   | :-:         |
+| $00$ | $\frac{1}{\sqrt 2} \left ( \left \vert 00 \right \rangle + \left \vert 11 \right \rangle \right )$ | $\frac{1}{\sqrt 2} \left ( \left \vert 00 \right \rangle + \left \vert 11 \right \rangle \right )$ | $\left \vert +0 \right \rangle$ | $\left \vert 00 \right \rangle$ | $00$ |
+| $01$ | $\frac{1}{\sqrt 2} \left ( \left \vert 00 \right \rangle + \left \vert 11 \right \rangle \right )$ | $\frac{1}{\sqrt 2} \left ( \left \vert 10 \right \rangle + \left \vert 01 \right \rangle \right )$ | $\left \vert +1 \right \rangle$ | $\left \vert 01 \right \rangle$ | $01$ |
+| $10$ | $\frac{1}{\sqrt 2} \left ( \left \vert 00 \right \rangle - \left \vert 11 \right \rangle \right )$ | $\frac{1}{\sqrt 2} \left ( \left \vert 00 \right \rangle - \left \vert 11 \right \rangle \right )$ | $\left \vert -0 \right \rangle$ | $\left \vert 10 \right \rangle$ | $10$ |
+| $11$ | $\frac{1}{\sqrt 2} \left ( \left \vert 00 \right \rangle - \left \vert 11 \right \rangle \right )$ | $\frac{1}{\sqrt 2} \left ( \left \vert 10 \right \rangle - \left \vert 01 \right \rangle \right )$ | $-\left \vert -1 \right \rangle$ | -$\left \vert 11 \right \rangle$ | $11$ |
+
+## quantum teleportation
+- $\big \vert \underbrace{01}_\text{Alice} \underbrace{0}_\text{Bob} \big \rangle$, last 2 are a bell pair
+- alice has $\alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle$
+- start state: $\left ( \alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle \right )_A \otimes \frac{1}{\sqrt 2} \left ( \left \vert 00 \right \rangle + \left \vert 11 \right \rangle \right )_{BC}$
+- alice
+  - todo: drawing
+  - $CNOT(A, B)$
+  - $H(A)$
+  - measure
+  - $\frac{1}{\sqrt 2} \left ( \alpha \left \vert 000 \right \rangle + \alpha \left \vert 011 \right \rangle + \beta \left \vert 100 \right \rangle + \beta \left \vert 111 \right \rangle \right ) \rightarrow \frac{1}{\sqrt 2} \left ( \alpha \left \vert 000 \right \rangle + \alpha \left \vert 011 \right \rangle + \beta \left \vert 110 \right \rangle + \beta \left \vert 101 \right \rangle \right )$
+  - $\rightarrow \frac{1}{2} \left ( \alpha \left \vert 001 \right \rangle + \alpha \left \vert 101 \right \rangle + \alpha \left \vert 011 \right \rangle + \alpha \left \vert 111 \right \rangle + \beta \left \vert 010 \right \rangle - \beta \left \vert 110 \right \rangle + \beta \left \vert 000 \right \rangle - \beta \left \vert 100 \right \rangle \right )$
+  - $\rightarrow \frac{1}{2} \left ( \left \vert 00 \right \rangle \otimes \left ( \alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle \right ) + \left \vert 01 \right \rangle \otimes \left ( \beta \left \vert 0 \right \rangle + \alpha \left \vert 1 \right \rangle \right ) + \left \vert 10 \right \rangle \otimes \left ( \alpha \left \vert 0 \right \rangle - \beta \left \vert 1 \right \rangle \right ) + \left \vert 11 \right \rangle \otimes \left ( -\beta \left \vert 0 \right \rangle + \alpha \left \vert 1 \right \rangle \right ) \right )$
+  - $\frac{1}{4}$ probability of sending any of the 4
+  - $00 \rightarrow \alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle$
+  - $01 \rightarrow \beta \left \vert 0 \right \rangle + \alpha \left \vert 1 \right \rangle$
+  - $10 \rightarrow \alpha \left \vert 0 \right \rangle - \beta \left \vert 1 \right \rangle$
+  - $11 \rightarrow -\beta \left \vert 0 \right \rangle + \alpha \left \vert 1 \right \rangle$
+- bob
+  - $b = 1 \Rightarrow X(C)$
+    - $00 \rightarrow \alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle$
+    - $01 \rightarrow \alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle$
+    - $10 \rightarrow \alpha \left \vert 0 \right \rangle - \beta \left \vert 1 \right \rangle$
+    - $11 \rightarrow \alpha \left \vert 0 \right \rangle - \beta \left \vert 1 \right \rangle$
+  - $a = 1 \Rightarrow Z(C)$
+    - $00 \rightarrow \alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle$
+    - $01 \rightarrow \alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle$
+    - $10 \rightarrow \alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle$
+    - $11 \rightarrow \alpha \left \vert 0 \right \rangle + \beta \left \vert 1 \right \rangle$
+- alice's qubit destroyed when measured
+
+## no cloning theorem
+- no quantum operation maps $\left \vert \psi 0 \right \rangle$ to $\left \vert \psi \psi \right \rangle$
+- suppose $U \left \vert \psi \right \rangle \left \vert 0 \right \rangle = \left \vert \psi \right \rangle \left \vert \psi \right \rangle$
+- pick $\left \vert \psi_1 \right \rangle, \left \vert \psi_2 \right \rangle$ such that $\mleft \langle \psi_1 \middle \vert \psi_2 \mright \rangle \neq 0$ and $\mleft \langle \psi_1 \middle \vert \psi_2 \mright \rangle \neq 1$
+- lemma: $\mleft \langle (v_1 \otimes v_2) \middle \vert (w_1 \otimes w_2) \mright \rangle = \mleft \langle v_1 \middle \vert w_1 \mright \rangle \cdot \mleft \langle v_2 \middle \vert w_2 \mright \rangle$
+- $\mleft \langle \psi_1 \middle \vert \psi_2 \mright \rangle = \mleft \langle \psi_1 \middle \vert \psi_2 \mright \rangle \cdot \mleft \langle 0 \middle \vert 0 \mright \rangle = \mleft \langle \psi_1 0 \middle \vert \psi_2 0 \mright \rangle = \left \langle U\left ( \left \vert \psi_1 0 \right \rangle \right ), U\left ( \left \vert \psi_2 0 \right \rangle \right ) \right \rangle = \mleft \langle \psi_1 \psi_1 \middle \vert \psi_2 \psi_2 \mright \rangle = \mleft \langle \psi_1 \middle \vert \psi_2 \mright \rangle \cdot \mleft \langle \psi_1 \middle \vert \psi_2 \mright \rangle$
+
+## universality
+- $NAND(x_1, x_2) = CCNOT(x_1, x_2, 1)$
+  - $CCNOT$ can simulate all of boolean logic
+- $\left \{ CCNOT, H \right \}$ is universal for all real unitaries
+- $\left \{ CCNOT, H, S = \begin{bmatrix} 1 & 0 \\ 0 & i \end{bmatrix} \right \}$ is universal for all unitaries
+- quantum computers implement $\left \{ CNOT, H, T \right \}$
+  - $S = T^2$
