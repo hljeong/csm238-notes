@@ -252,3 +252,48 @@
 - $= \frac{1}{\sqrt{2^n}} \left ( \sum_{x \in \left \{ 0, 1 \right \}^n} \frac{1}{\sqrt{2^n}} \sum_{y \in \left \{ 0, 1 \right \}^n} (-1)^{x \cdot y} \left \vert y \right \rangle \right ) \otimes \left \vert - \right \rangle$
 - $= \frac{1}{2^n} \left ( \sum_x \sum_y (-1)^{f(x) \oplus x \cdot y} \left \vert y \right \rangle \right ) \otimes \left \vert - \right \rangle$
 - for $\left \vert y \right \rangle = \left \vert 0 \right \rangle^{\otimes n} \left \vert - \right \rangle$, only final state $= \frac{1}{2^n} \left ( \sum_x (-1)^{f(x)} \left \vert 0 \right \rangle^{\otimes n} \right ) \otimes \left \vert - \right \rangle$
+
+# 10.11 3t
+
+## bernstein-vazirani problem
+- input: a function $f \colon \left \{ 0, 1 \right \}^n \to \left \{ 0, 1 \right \}$
+- assumption: $f(x) = (a \dot x) \oplus b$
+- outpu: $a, b$
+- $f(0 \dots 0) = b$
+- $f(0 \dots 0 1) = a_n \oplus b$
+- $a = 0 \dots 0 \Rightarrow f(x) = b$: $f$ is constant
+- $a \neq 0 \dots 0$: $f$ is balanced
+  - every input has a sister input (e.g. flipping the last bit) that flips the output
+- ideas
+  - superposition
+  - $U_f$ will move something to the exponent (of $-1$)
+  - $H^{\otimes n}$ will move the exponent back down
+- goal: final state $\left \vert a \right \rangle$
+- circuit
+  - todo: drawing
+  - $\operatorname{measure}_{1 : n}((H^{\otimes n} \otimes I) U_f H^{\otimes (n + 1)}(\left \vert 0 \dots 01 \right \rangle))$
+- $\frac{1}{2^n} \sum_{x \in \left \{ 0, 1 \right \}^n} \sum_{y \in \left \{ 0, 1 \right \}^n} (-1)^{(x \cdot y) \oplus f(x)} \left \vert y \right \rangle = \frac{1}{2^n} \sum_{x \in \left \{ 0, 1 \right \}^n} \sum_{y \in \left \{ 0, 1 \right \}^n} (-1)^{(x \cdot y) \oplus (a \cdot x) \oplus b} \left \vert y \right \rangle$
+  - $= \frac{1}{2^n} \sum_{x \in \left \{ 0, 1 \right \}^n} \sum_{y \in \left \{ 0, 1 \right \}^n} (-1)^{(x \cdot (y \oplus a)) \oplus b} \left \vert y \right \rangle = \frac{(-1)^b}{2^n} \sum_{x \in \left \{ 0, 1 \right \}^n} \sum_{y \in \left \{ 0, 1 \right \}^n} (-1)^{x \cdot (y \oplus a)} \left \vert y \right \rangle$
+  - amplitude of $\left \vert a \right \rangle = \frac{1}{2^n} \sum_{x \in \left \{ 0, 1 \right \}^n} (-1)^{x \cdot (a \oplus a)} = (-1)^b$
+  - then original expression $= (-1)^b \left \vert a \right \rangle$
+
+## another problem
+- input: $f \colon \left \{ 0, 1 \right \}^2 \to \left \{ 0, 1 \right \}$
+- assumption: $f$ is $1$ on a single input
+- output: the single input
+- circuit
+  - goal: $\left \vert cd \right \rangle$
+  - todo: drawing
+  - $\operatorname{measure}_{1 : n}((V \otimes I) U_f H^{\otimes 3} \left \vert 0 \dots 01 \right \rangle)$
+  - need to find $V$
+  - let 
+    - $\varphi_{00} = \frac{1}{2} \left ( -\left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle + \left \vert 11 \right \rangle \right )$
+    - $\varphi_{01} = \frac{1}{2} \left ( \left \vert 00 \right \rangle - \left \vert 01 \right \rangle + \left \vert 10 \right \rangle + \left \vert 11 \right \rangle \right )$
+    - $\varphi_{10} = \frac{1}{2} \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle - \left \vert 10 \right \rangle + \left \vert 11 \right \rangle \right )$
+    - $\varphi_{11} = \frac{1}{2} \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle - \left \vert 11 \right \rangle \right )$
+  - $(V \otimes I) U_f H^{\otimes 3} \left \vert 001 \right \rangle = (V \otimes I) U_f \frac{1}{2} \left ( \left \vert 00- \right \rangle + \left \vert 01- \right \rangle + \left \vert 10- \right \rangle + \left \vert 11- \right \rangle \right )$
+    - $= (V \otimes I) \frac{1}{2} \left ( (-1)^{f(00)} \left \vert 00- \right \rangle + (-1)^{f(01)} \left \vert 01- \right \rangle + (-1)^{f(10)} \left \vert 10- \right \rangle + (-1)^{f(11)} \left \vert 11- \right \rangle \right )$
+    - $= (V \otimes I) (\varphi_{cd} \otimes \left \vert - \right \rangle)$
+  - want $V(\varphi_{cd}) = \left \vert cd \right \rangle$
+  - $V = \frac{1}{2} \begin{bmatrix} -1 & 1 & 1 & 1 \\ 1 & -1 & 1 & 1 \\ 1 & 1 & -1 & 1 \\ 1 & 1 & 1 & -1 \end{bmatrix}$
+    - $\left (= \begin{bmatrix} \varphi_{00} & \varphi_{01} & \varphi_{10} & \varphi_{11} \end{bmatrix}^{-1}\right )$
