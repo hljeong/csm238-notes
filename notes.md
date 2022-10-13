@@ -257,7 +257,7 @@
 
 ## bernstein-vazirani problem
 - input: a function $f \colon \left \{ 0, 1 \right \}^n \to \left \{ 0, 1 \right \}$
-- assumption: $f(x) = (a \dot x) \oplus b$
+- assumption: $f(x) = (a \cdot x) \oplus b$
 - outpu: $a, b$
 - $f(0 \dots 0) = b$
 - $f(0 \dots 0 1) = a_n \oplus b$
@@ -297,3 +297,66 @@
   - want $V(\varphi_{cd}) = \left \vert cd \right \rangle$
   - $V = \frac{1}{2} \begin{bmatrix} -1 & 1 & 1 & 1 \\ 1 & -1 & 1 & 1 \\ 1 & 1 & -1 & 1 \\ 1 & 1 & 1 & -1 \end{bmatrix}$
     - $\left (= \begin{bmatrix} \varphi_{00} & \varphi_{01} & \varphi_{10} & \varphi_{11} \end{bmatrix}^{-1}\right )$
+
+# 10.13 3th
+
+## simon's problem
+- input: $f \colon \left \{ 0, 1 \right \}^n \to \left \{ 0, 1 \right \}^n$
+- assumption: $\exists \, s \in \left \{ 0, 1 \right \}\; \forall \, x, y: f(x) = f(y) \Leftrightarrow (x + y) \in \left \{ 0^n, s \right \}$
+- output: $s$
+- $n = 3, s = 110$
+
+| $x$ | $f(x)$ |
+| :-: | :-:    |
+| 000 | 101    |
+| 001 | 010    |
+| 010 | 000    |
+| 011 | 110    |
+| 100 | 000    |
+| 101 | 110    |
+| 110 | 101    |
+| 111 | 010    |
+
+## simon's alg
+- repeat $f \rightarrow \text{quantum generate} \rightarrow \text{equations} \rightarrow \text{classical solve} \rightarrow s$ until the chance of success is high
+- $y_1 \cdot s = 0, \dots, y_{n - 1} \cdot s = 0$
+- ideally the $y_i$'s are linearly independent
+- $P(\text{$y_i$'s are linearly independent}) > \frac{1}{4}$
+
+## events
+- $E_1$: $y_1$ is not $0$
+- for $k = 2, \dots, n - 1$: 
+  - $E_k$: $y_k$ is not in the span of $y_1, \dots, y_{k - 1}$
+- $E$: $y_1, \dots, y_{n - 1}$ are linearly independent
+- sample from a space of size $2^{n - 1}$
+- $P(E_1) = P(E_1 \wedge \cdots \wedge E_n) = P(E_1) \cdot P(E_2 \wedge \cdots \wedge E_{n - 1} \mid E_1) = P(1) \cdot \prod_{k = 2}^n P(E_k \mid E_1 \wedge \cdots \wedge E_{k - 1})$
+  - $P(E_1) = 1 - 1 / 2^{n - 1}$
+  - $\prod_k = 1 - 2^{k - 1} / 2^{n - 1}$
+  - $= (1 - 1 / 2^{n - 1}) \cdots (1 - 1 / 2) > 1 / 4$
+  - for all $k = 1, \dots, n - 1$: $(1 - 1 / 2^{n - 1}) \cdots (1 - 1 / 2^{n - (k - 1)}) > (1 - 1 / 2^{n - k})$
+  - for $k + 1$
+    - lhs: $(1 - 1 / 2^{n - 1}) \cdots (1 - 1 / 2^{n - k}) > (1 - 1 / 2^{n - k})^2 = \left ( \frac{2^{n - k} - 1}{2^{n - k}} \right )^2 = \frac{2^{2 n - 2 k} - 2^{n - (k - 1)} + 1}{2^{2 n - 2 k}}$
+    - rhs: $1 - 1 / 2^{n - (k + 1)} = \frac{2^{n - (k + 1)} - 1}{2^{n - (k + 1)}} = \frac{2^{2 n + 2 k} - 2^{n - (k - 1)}}{2^{2 n + 2 k}}$
+- run the whole thing $4 m$ times
+- $P(\text{failure}) < \left ( 1 - \frac{1}{4} \right )^{4 m} < e^{-m}$
+
+## circuit
+- todo: drawing
+- $U_f \left \vert x \right \rangle \otimes \left \vert b \right \rangle = \left \vert x \right \rangle \otimes \left \vert b \oplus f(x) \right \rangle$
+- $\operatorname{measure}_{1 : n} (H^{\otimes n} \otimes I^{\otimes n}) U_f (H^{\otimes n} \otimes I^{\otimes n}) \left \vert 0^n \right \rangle \otimes \left \vert 0^n \right \rangle$
+- $= (H^{\otimes n} \otimes I^{\otimes n}) U_f \left ( \frac{1}{\sqrt{2^n}} \sum_{x \in \left \{ 0, 1 \right \}^n} \left \vert x \right \rangle \right ) \otimes \left \vert 0^n \right \rangle$
+- $= (H^{\otimes n} \otimes I^{\otimes n}) \frac{1}{\sqrt{2^n}} \left ( \sum_{x \in \left \{ 0, 1 \right \}^n} \left \vert x \right \rangle \right ) \otimes \left \vert f(x) \right \rangle$
+- $= \frac{1}{2^n} \sum_{x \in \left \{ 0, 1 \right \}^n} \sum_{y \in \left \{ 0, 1 \right \}^n} (-1)^{x \cdot y} \left \vert y \right \rangle \otimes \left \vert f(x) \right \rangle$
+- $= \sum_{y \in \left \{ 0, 1 \right \}^n} \left \vert y \right \rangle \left ( \frac{1}{2^n} \sum_{x \in \left \{ 0, 1 \right \}^n} (-1)^{x \cdot y} \left \vert f(x) \right \rangle \right )$
+- $s = 0$
+  - $\left | \frac{1}{2^n} \sum_{x \in \left \{ 0, 1 \right \}^n} (-1)^{x \cdot y} \left \vert f(x) \right \rangle \right |^2$
+  - $f$ is injective so $\left \vert f(x) \right \rangle$ is an orthonormal basis $\rightarrow$ use pythagorean theorem 
+  - $= \frac{1}{2^{2 n}} \sum_{x \in \left \{ 0, 1 \right \}^n} \left | (-1)^{x \cdot y} \left \vert f(x) \right \rangle \right |^2$
+  - $= \frac{1}{2^n}$ uniform distribution
+- $s \neq 0$
+  - $y$ is drawn from a set $A$ of size $2^{n - 1}$
+  - for $z \in A$, we have $x_z, x_z' \in \left \{ 0, 1 \right \}^n$ where $f(x_z) = f(x_z') = z$ and $x_z \oplus x_z' = s$
+  - $\left | \frac{1}{2^n} \sum_{x \in \left \{ 0, 1 \right \}^n} (-1)^{x \cdot y} \left \vert f(x) \right \rangle \right |^2 = \left | \frac{1}{2^n} \sum_{z \in A} \left ( (-1)^{x_z \cdot y} + (-1)^{x_z' \cdot y} \right ) \left \vert z \right \rangle \right |^2$
+  - $= \left | \frac{1}{2^n} \sum_{z \in A} (-1)^{x_z \cdot y} \left ( 1 + (-1)^{s \cdot y} \right ) \left \vert z \right \rangle \right |^2$
+  - todo: $\left \vert z \right \rangle$s are orthogonal???
+  - $= \begin{cases} 2^{1 - n} & s \cdot y = 0 \\ 0 & s \cdot y = 1 \end{cases}$ uniform distribution
