@@ -304,6 +304,7 @@
 - input: $f \colon \left \{ 0, 1 \right \}^n \to \left \{ 0, 1 \right \}^n$
 - assumption: $\exists \, s \in \left \{ 0, 1 \right \}\; \forall \, x, y: f(x) = f(y) \Leftrightarrow (x + y) \in \left \{ 0^n, s \right \}$
 - output: $s$
+\newpage
 - $n = 3, s = 110$
 
 | $x$ | $f(x)$ |
@@ -360,3 +361,88 @@
   - $= \left | \frac{1}{2^n} \sum_{z \in A} (-1)^{x_z \cdot y} \left ( 1 + (-1)^{s \cdot y} \right ) \left \vert z \right \rangle \right |^2$
   - todo: $\left \vert z \right \rangle$s are orthogonal???
   - $= \begin{cases} 2^{1 - n} & s \cdot y = 0 \\ 0 & s \cdot y = 1 \end{cases}$ uniform distribution
+
+# 10.18 4t
+
+## grover's problem
+- input: $f \colon \left \{ 0, 1 \right \}^n \to \left \{ 0, 1 \right \}$
+- output: $\begin{cases}
+  1 & \exists \, x \in \left \{ 0, 1 \right \}^n: f(x) = 1 \\ 
+  0 & \text{otherwise}
+\end{cases}$
+- $Z_f\left \vert x \right \rangle = (-1)^{f(x)} \left \vert x \right \rangle$
+- $Z_0 \left \vert x \right \rangle = \begin{cases}
+  -\left \vert x \right \rangle & x = 0^n \\ 
+  \left \vert x \right \rangle & x \neq 0^n
+\end{cases}$
+  - todo: drawing
+  - NAND into 1 qubit, use Z gate, uncompute NAND
+- $G = - H^{\otimes n} Z_0 H^{\otimes n} Z_f$
+
+## grover's algorithm
+- $x$: $n$ qubits, initially $\left \vert 0^n \right \rangle$
+1. apply $H^{\otimes n}$ to $x$
+2. repeat (apply $G$ to $x$) $\mathcal O(\sqrt{2^n})$ times
+3. measure $x$ and output the result
+
+## example $n = 2$
+- $f \colon \left \{ 0, 1 \right \}^2 \to \left \{ 0, 1 \right \}$
+- $f(00) = f(01) = f(10) = 0$
+- $f(11) = 1$
+- $\begin{aligned}[t]
+    H^{\otimes 2}\left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle - \left \vert 11 \right \rangle \right ) = \frac{1}{2} \big ( &\left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle + \left \vert 11 \right \rangle \right ) \\ 
+    &+ \left ( \left \vert 00 \right \rangle - \left \vert 01 \right \rangle + \left \vert 10 \right \rangle - \left \vert 11 \right \rangle \right ) \\ 
+    &+ \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle - \left \vert 10 \right \rangle - \left \vert 11 \right \rangle \right ) \\ 
+    &- \left ( \left \vert 00 \right \rangle - \left \vert 01 \right \rangle - \left \vert 10 \right \rangle + \left \vert 11 \right \rangle \right ) \big ) = \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle - \left \vert 11 \right \rangle
+  \end{aligned}$
+- $\begin{aligned}[t]
+    G H^{\otimes 2} \left \vert 00 \right \rangle &= G \frac{1}{2} \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle + \left \vert 11 \right \rangle \right ) \\
+    &= -H^{\otimes 2} Z_0 H^{\otimes 2} Z_f \frac{1}{2} \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle + \left \vert 11 \right \rangle \right ) \\ 
+    &= -H^{\otimes 2} Z_0 H^{\otimes 2} \frac{1}{2} \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle - \left \vert 11 \right \rangle \right ) \\ 
+    &= -H^{\otimes 2} Z_0 \frac{1}{2} \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle - \left \vert 11 \right \rangle \right ) \\ 
+    &= -H^{\otimes 2} \frac{1}{2} \left ( -\left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle - \left \vert 11 \right \rangle \right ) \\ 
+    &= -H^{\otimes 2} \frac{1}{2} \left ( -2 \left \vert 00 \right \rangle + \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle - \left \vert 11 \right \rangle \right ) \right ) \\ 
+    &= -\frac{1}{2} \left ( -2 \cdot \frac{1}{2} \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle + \left \vert 11 \right \rangle \right ) + \left ( \left \vert 00 \right \rangle + \left \vert 01 \right \rangle + \left \vert 10 \right \rangle - \left \vert 11 \right \rangle \right ) \right ) \\ 
+    &= \left \vert 11 \right \rangle
+  \end{aligned}$
+
+## example
+- notation
+  - $A = \left \{ x \in \left \{ 0, 1 \right \}^n : f(x) = 1 \right \}$
+  - $B = \left \{ x \in \left \{ 0, 1 \right \}^n : f(x) = 0 \right \}$
+  - $N = 2^n, a = \left | A \right |, b = \left | B \right |$
+  - $\left \vert A \right \rangle = \frac{1}{\sqrt a} \sum_{x \in A} \left \vert x \right \rangle$
+  - $\left \vert B \right \rangle = \frac{1}{\sqrt b} \sum_{x \in B} \left \vert x \right \rangle$
+- $\left \vert A \right \rangle$ and $\left \vert B \right \rangle$ are orthogonal
+- lemma
+  - $G \left \vert A \right \rangle = \left ( 1 - \frac{2 a}{N} \right ) \left \vert A \right \rangle - \frac{2 \sqrt{a b}}{N} \left \vert B \right \rangle$
+  - $G \left \vert B \right \rangle = \frac{2 \sqrt{a b}}{N} \left \vert A \right \rangle - \left ( 1 - \frac{2 b}{N} \right ) \left \vert B \right \rangle$
+  - that is, $\operatorname{span}\left \{ \left \vert A \right \rangle, \left \vert B \right \rangle \right \}$ is closed under $G$
+  - $\left \vert h \right \rangle = H^{\otimes n} \left \vert 0^n \right \rangle = \frac{1}{\sqrt N} \sum_{x \in \left \{ 0, 1 \right \}^n} \left \vert x \right \rangle = \frac{\sqrt a}{\sqrt N} \left \vert A \right \rangle + \frac{\sqrt b}{\sqrt N} \left \vert B \right \rangle$
+  - $Z_0 = \begin{bmatrix} -1 & 0 & \cdots & 0 \\ 0 & 1 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & 1 \end{bmatrix} = I - 2 \left \vert 0^n \right \rangle \left \langle 0^n \right \vert$
+  - $\begin{aligned}[t]
+      H^{\otimes n} Z_0 H^{\otimes n} &= H^{\otimes n} \left ( I - 2 \left \vert 0^n \right \rangle \left \langle 0^n \right \vert \right ) H^{\otimes n} \\ 
+      &= H^{\otimes n} I H^{\otimes n} - 2 H^{\otimes n} \left \vert 0^n \right \rangle \left \langle 0^n \right \vert H^{\otimes n} \\ 
+      &= I - 2 \left \vert h \right \rangle \left \langle h \right \vert
+    \end{aligned}$
+  - $\begin{aligned}[t]
+      G \left \vert A \right \rangle &= -H^{\otimes n} Z_0 H^{\otimes n} Z_f \left \vert A \right \rangle \\ 
+      &= \left ( I - 2 \left \vert h \right \rangle \left \langle h \right \vert \right ) (-Z_f) \left \vert A \right \rangle \\ 
+      &= \left ( I - \left \vert h \right \rangle \left \langle h \right \vert \right ) \left \vert A \right \rangle \\ 
+      &= \left \vert A \right \rangle - 2 \left \vert h \right \rangle \left \langle h \right \vert \left \vert A \right \rangle \\ 
+      &= \left \vert A \right \rangle - 2 \mleft \langle h \middle \vert A \mright \rangle \left \vert h \right \rangle \in \operatorname{span}\left \{ \left \vert A \right \rangle, \left \vert B \right \rangle \right \} \\ 
+      &= \left \vert A \right \rangle - 2 \cdot \frac{\sqrt a}{\sqrt N} \cdot \left ( \frac{\sqrt a}{\sqrt N} \left \vert A \right \rangle + \frac{\sqrt b}{\sqrt N} \left \vert b \right \rangle \right ) \\ 
+      &= \left ( 1 - \frac{2 a}{N} \right ) \left \vert A \right \rangle - \frac{2 \sqrt{a b}}{\sqrt B} \left \vert B \right \rangle
+    \end{aligned}$
+  - $M = G_{\left \{ \left \vert B \right \rangle, \left \vert A \right \rangle \right \}} = \begin{bmatrix} -\left ( 1 - \frac{2 b}{N} \right ) & -\frac{2 \sqrt{a b}}{N} \\ \frac{2 \sqrt{a b}}{N} & 1 - \frac{2 a}{N} \end{bmatrix}$
+  - $\left ( \frac{\sqrt a}{\sqrt N} \right )^2 + \left ( \frac{\sqrt{b}}{\sqrt N} \right )^2 = 1$
+  - let $\theta$ be such that $\sin \theta = \frac{\sqrt a}{\sqrt N}$ and $\cos \theta = \frac{\sqrt b}{\sqrt N}$
+  - $R_\theta = \begin{bmatrix} \cos \theta & -\sin \theta \\ \sin \theta & \cos \theta \end{bmatrix} \Rightarrow R_\theta^2 = M$
+  - after $k$ iterations: $\sin((2 k + 1) \theta) \left \vert A \right \rangle + \cos((2 k + 1) \theta) \left \vert B \right \rangle$
+  - want $\sin((2 k + 1) \theta) \approx 1$
+    - $(2 k + 1) \theta \approx \frac{\pi}{2}$
+    - $2 k + 1 \approx \frac{\pi}{2 \theta}$
+    - $k \approx \frac{\pi}{4 \theta} - \frac{1}{2}$
+    - for $a = 1$, $\theta \approx \sin \theta = \frac{1}{\sqrt N}$
+    - $k \approx \frac{\pi \sqrt N}{4} - \frac{1}{2} \approx \sqrt N$
+  - previous example: $\sin \theta = \frac{\sqrt 1}{\sqrt 4} = \frac{1}{2} \Rightarrow \theta = \frac{\pi}{6} \Rightarrow (2 + 1) \theta = \frac{\pi}{2}$
