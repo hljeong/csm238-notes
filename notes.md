@@ -446,3 +446,69 @@
     - for $a = 1$, $\theta \approx \sin \theta = \frac{1}{\sqrt N}$
     - $k \approx \frac{\pi \sqrt N}{4} - \frac{1}{2} \approx \sqrt N$
   - previous example: $\sin \theta = \frac{\sqrt 1}{\sqrt 4} = \frac{1}{2} \Rightarrow \theta = \frac{\pi}{6} \Rightarrow (2 + 1) \theta = \frac{\pi}{2}$
+
+# 10.25 5t
+
+## algorithm for integer factorization
+- input: `int` $N \geq 2$
+- output: $N = p_1^{k_1} \cdots p_m^{k_m}$
+- method: 
+  - if $N = p^k$ return $p^k$
+  - else if $N$ is even return combine(2, factor($N / 2$))
+  - else
+    - `int` d = shor($N$)
+    - return combine(factor($d$), factor($N / d$))
+
+## shor's algorithm
+- input: odd composite `int` $N$ not the power of a prime
+- output: a nontrivial factor $d$
+- method: repeat
+  - `int a = random(2, 3, ..., N - 1)`
+  - `int d = gcd(a, N)`
+  - `if (d > 1) return d`
+  - `else`
+    - `int r = find_order_candidate(a, N)`
+      - $a^r \equiv 1\ (\mathrm{mod}\ N)$
+    - `if r is even`
+      - `int x = a ** (r / 2) - 1 mod N`
+      - `int d = gcd(x, N)`
+      - `if (d > 1) return d`
+  - until give up
+- $\mathbb Z / N = \left \{ 0, \dots, N - 1 \right \}$
+- $(\mathbb Z / N)^* = \left \{ a \in \mathbb Z / N : \operatorname{gcd}(a, N) = 1 \right \}$ is a group with multiplication
+- need `find_order_candidate` to be polynomial with respect to $\log N$
+- $N \mid (a^r - 1) = (a^{r / 2} + 1) (a^{r / 2} - 1)$
+- never $N \mid (a^{r / 2} - 1)$ since $r$ is the order, the smallest such that $N \mid (a^r - 1)$
+
+## example
+- $N = 21, a = 2$
+- $d = \operatorname{gcd}(a, N) = \operatorname{gcd}(2, 21)$
+- $r = \verb~find_order_cand~(2, 21) = 6$
+- $x = (a^{r / 2} - 1) \% N = 7$
+- $d = \operatorname{gcd}(x, N) = 7 > 1$
+
+## find order algorithm
+- input: `int` $N$, `int` $a \in (\mathbb Z / N)^*$
+- output: the smallest `int` $r > 0$ such that $a^r \equiv 1\ (\mathrm{mod}\ N)$ or some other integer
+- method: 
+  - `float` $f = \verb~phase_estimation~(M_1, \left \vert 1 \right \rangle)$
+  - `fraction` $q = \verb~fraction_with_bounded_denominator~(f, N)$
+  - `return` $\verb~denominator~(q)$
+- $M_a \left \vert x \right \rangle = \left \vert a \cdot x\ (\mathrm{mod}\ N) \right \rangle$
+- $\omega = e^{2 \pi i / r}$
+- for $0 \leq k < r$
+  - $\left \vert \psi_k \right \rangle = \frac{1}{\sqrt r} (\left \vert 1 \right \rangle + \left \vert \omega \right \rangle^{-k} \left \vert a \right \rangle + \omega^{-2 k} \left \vert a^2 \right \rangle + \cdots + \omega{-(r - 1) k} \left \vert a^{r - 1} \right \rangle)$
+- lemma: $M_a \left \vert \psi_k \right \rangle = \omega^k \left \vert \psi_k \right \rangle$
+  - $\begin{aligned}[t]
+      M_a \left \vert \psi_1 \right \rangle &= M_a \frac{1}{\sqrt r} (\left \vert 1 \right \rangle + \omega^{-1} \left \vert a \right \rangle + \omega^{-2} \left \vert a^2 \right \rangle + \cdots + \omega^{-(r - 1)} \left \vert a^{r - 1} \right \rangle) \\ 
+      &= \frac{1}{\sqrt r} (\left \vert a \right \rangle + \omega^{-1} \left \vert a^2 \right \rangle + \omega^2 \left \vert a^3 \right \rangle + \cdots + \omega^{-(r - 1)} \left \vert a^r = 1 \right \rangle ) \\ 
+      &= \frac{\omega}{\sqrt r} (\omega^{-1} \left \vert a \right \rangle + \omega^{-2} \left \vert a^2 \right \rangle + \omega^{-3} \left \vert a^3 \right \rangle + \omega^{-(r - 1) - 1} \left \vert 1 \right \rangle ) \\ 
+      &= \omega \left \vert \psi_1 \right \rangle
+    \end{aligned}$
+
+## phase estimation algorithm
+- input: unitary $U$ and unit vector $\left \vert \psi \right \rangle$
+  - $\psi$ is a linear combination of eigenvectors of $U$
+  - $U \left \vert \psi_k \right \rangle = e^{2 \pi i \theta_k} \left \vert \psi_k \right \rangle$
+- output: $\theta_k$, for some $k$
+- $f \approx \frac{k}{r}$
