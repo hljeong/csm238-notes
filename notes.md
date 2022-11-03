@@ -512,3 +512,61 @@
   - $U \left \vert \psi_k \right \rangle = e^{2 \pi i \theta_k} \left \vert \psi_k \right \rangle$
 - output: $\theta_k$, for some $k$
 - $f \approx \frac{k}{r}$
+
+# 10.27 5th
+
+## phase estimation algorithm
+- input: unitary $U$, eigenvector $\left \vert \psi \right \rangle$ of $U$
+  - $U \left \vert \psi \right \rangle = e^{2 \pi i \theta} \left \vert \psi \right \rangle$
+- ouput: $\theta$
+- $\Lambda_m(U) \left \vert k \right \rangle \left \vert \psi \right \rangle = \left \vert k \right \rangle U^k \left \vert \psi \right \rangle$
+  - $\left \vert k \right \rangle$ has $m$ qubits
+  - $\left \vert \psi \right \rangle$ has $n$ qubits
+- $\begin{aligned}[t]
+    \Lambda_m(U) (H^{\otimes m} \otimes I^{\otimes n}) \left \vert 0^m \right \rangle \left \vert \psi \right \rangle &= \frac{1}{2^{m / 2}} \sum_{k = 0}^{2^m - 1} \left \vert k \right \rangle U^k \left \vert \psi \right \rangle \\ 
+    &= \left ( \frac{1}{2^{m / 2}} \sum_{k = 0}^{2^m - 1} e^{2 \pi k i \theta} \left \vert k \right \rangle \right ) \left \vert \psi \right \rangle
+  \end{aligned}$
+
+## quantum fourier transform
+- $\omega = e^{2 \pi i / 2^m}$
+- $\operatorname{QFT}{2^m} \left \vert j \right \rangle = \frac{1}{2^{m / 2}} \sum_{k = 0}^{2^m - 1} \omega^{j k} \left \vert k \right \rangle = \frac{1}{2^{m / 2}} \begin{bmatrix} 1 & 1 & 1 & \cdots & 1 \\ 1 & \omega & \omega^2 & \cdots & \omega^{2^m - 1} \\ 1 & \omega^2 & \omega^4 & \cdots & \omega^{2 (2^m - 1)} \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ 1 & \omega^{2^m - 1} & \omega^{2 (2^m - 1)} & \cdots & \omega^{(2^m - 1)^2} \end{bmatrix}$
+- $\operatorname{QFT}_{2^m}^\dagger \left \vert k \right \rangle = \frac{1}{2^{m / 2}} \sum_{j = 0}^{2^m - 1} \omega^{-j k} \left \vert j \right \rangle$
+- lemma
+  - $\sum_{k = 0}^{2^m - 1} \omega^{k (j - l)} = \begin{cases}
+    2^m & j = l \\ 
+    0 & j \neq l
+  \end{cases}$
+  - for $j \neq l$, $\sum_{k = 0}^{2^m - 1} \omega^{k (j - l)} = \sum_{k = 0}^{2^m - 1} (\omega^{j - l})^k = \frac{1 - \omega^{2^m (j - l)}}{1 - \omega^{j - l}} = \frac{1 - (\omega^{2^m})^{j - l}}{1 - \omega^{j - l}} = 0$
+
+## phase estimation, cont.
+- $\operatorname{PhaseEst}_m U \left \vert \psi \right \rangle = (\operatorname{QFT}_{2^m}^\dagger \otimes I^{\otimes n}) \Lambda_m(U) (H^{\otimes m} \otimes I^{\otimes m}) (\left \vert 0^m \right \rangle \otimes \left \vert \psi \right \rangle)$
+- let $\theta = j / 2^m$
+  - $\begin{aligned}[t]
+      \operatorname{PhaseEst}_m U \left \vert \psi \right \rangle &= (\operatorname{QFT}_{2^m}^\dagger \otimes I^{\otimes n}) \Lambda_m(U) (H^{\otimes m} \otimes I^{\otimes m}) (\left \vert 0^m \right \rangle \otimes \left \vert \psi \right \rangle) \\ 
+      &= (\operatorname{QFT}_{2^m}^\dagger \otimes I^{\otimes n}) \frac{1}{2^{m / 2}} \sum_{k = 0}^{2^m - 1} e^{2 \pi k i \theta} \left \vert k \right \rangle \left \vert \psi \right \rangle \\ 
+      &= (\operatorname{QFT}_{2^m}^\dagger \otimes I^{\otimes n}) \frac{1}{2^{m / 2}} \sum_{k = 0}^{2^m - 1} e^{2 \pi k i (j / 2^m)} \left \vert k \right \rangle \left \vert \psi \right \rangle \\ 
+      &= (\operatorname{QFT}_{2^m}^\dagger \otimes I^{\otimes n}) \frac{1}{2^{m / 2}} \sum_{k = 0}^{2^m - 1} \omega^{j k} \left \vert k \right \rangle \left \vert \psi \right \rangle \\ 
+      &= (\operatorname{QFT}_{2^m}^\dagger \otimes I^{\otimes n}) \operatorname{QFT}_{2^m} \left \vert j \right \rangle \left \vert \psi \right \rangle \\ 
+      &= \left \vert j \right \rangle \left \vert \psi \right \rangle
+    \end{aligned}$
+- $\begin{aligned}[t]
+    \operatorname{PhaseEst}_m U \left \vert \psi \right \rangle &= (\operatorname{QFT}_{2^m}^\dagger \otimes I^{\otimes n}) \Lambda_m(U) (H^{\otimes m} \otimes I^{\otimes m}) (\left \vert 0^m \right \rangle \otimes \left \vert \psi \right \rangle) \\ 
+    &= (\operatorname{QFT}_{2^m}^\dagger \otimes I^{\otimes n}) \frac{1}{2^{m / 2}} \sum_{k = 0}^{2^m - 1} e^{2 \pi k i \theta} \left \vert k \right \rangle \left \vert \psi \right \rangle \\ 
+    &= (\operatorname{QFT}_{2^m}^\dagger \otimes I^{\otimes n}) \frac{1}{2^{m / 2}} \sum_{k = 0}^{2^m - 1} e^{2 \pi k i (j / 2^m)} \left \vert k \right \rangle \left \vert \psi \right \rangle \\ 
+    &= \frac{1}{2^m} \sum_{k = 0}^{2^m - 1} \sum_{j = 0}^{2^m - 1} \omega^{2^m k \theta} \omega^{-j k} \left \vert j \right \rangle \left \vert \psi \right \rangle \\ 
+    &= \sum_{j = 0}^{2^m - 1} \left ( \frac{1}{2^m} \sum_{k = 0}^{2^m - 1} \omega^{k (2^m \theta - j)} \right ) \left \vert j \right \rangle \left \vert \psi \right \rangle
+  \end{aligned}$
+- we get $\left \vert j \right \rangle$ with probability $p_j = \left | \frac{1}{2^m} \sum_{k = 0}^{2^m - 1} \omega^{k (2^m \theta - j)} \right |^2$
+  - with $0 < \left | \varepsilon \right | \leq \frac{1}{2^{m + 1}}$, we have $\theta = \frac{j}{2^m} + \varepsilon$
+  - $\begin{aligned}[t]
+    p_j &= \frac{1}{2^{2 m}} \left | \frac{1 - \omega^{2^m (2^m \theta - j)}}{1 - \omega^{2^m \theta - j}} \right |^2 = \frac{1}{2^{2 m}} \left | \frac{1 - \omega^{2^{2 m} \varepsilon}}{1 - \omega^{2^m \varepsilon}} \right |^2 \\ 
+    &= \frac{1}{2^{2 m}} \left | \frac{1 - e^{2^{m + 1} \varepsilon \pi i}}{1 - e^{2 \varepsilon \pi i}} \right |^2 \\
+    &= \frac{1}{2^{2 m}} \left | 1 + \omega^{(2^{2 m} - 1) \varepsilon} \right |^2 = \frac{1}{2^{2 m}} \left | 1 + e^{2^{m + 1} \varepsilon \pi i} \right |^2 \\ 
+    &\geq \frac{1}{2^{2 m}} \left | 1 + e^{\pi i} \right |^2 \\ 
+    &\geq \frac{4}{\pi^2} \approx 0.4
+  \end{aligned}$
+
+## encoding a number
+- $\widetilde{\operatorname{QFT}}_2 = H$
+- $\widetilde{\operatorname{QFT}}_{2^{m + 1}} = ( H \otimes I^{\otimes m} ) \bigotimes_{i = 1}^m \left ( \operatorname{CZ}[0, i] \right ) (I \otimes \widetilde{\operatorname{QFT}}_{2^m})$
+- number of gates: $\mathcal O(n^2)$
