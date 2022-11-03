@@ -570,3 +570,56 @@
 - $\widetilde{\operatorname{QFT}}_2 = H$
 - $\widetilde{\operatorname{QFT}}_{2^{m + 1}} = ( H \otimes I^{\otimes m} ) \bigotimes_{i = 1}^m \left ( \operatorname{CZ}[0, i] \right ) (I \otimes \widetilde{\operatorname{QFT}}_{2^m})$
 - number of gates: $\mathcal O(n^2)$
+
+# 11.3 6th
+
+## error
+- bit flip
+  - $0 \to 1$
+  - $1 \to 0$
+- add redundancy
+  - need massive amounts for quantum computing
+- error detection: sender sends, receiver requests retransmit
+- error correction: sender sends, receiver corrects
+- bit copy: $0 \to 000$, $1 \to 111$
+  - receive
+    - $000$, $100$, $010$, $001$ understood as 0
+    - $110$, $101$, $011$, $111$ understood as 1
+- codeword
+  - code $\to$ error syndrome
+  - $000, 111 \to 00$, no error
+  - $100, 011 \to 10$, first bit flipped
+  - $010, 101 \to 11$, second bit flipped
+  - $001, 110 \to 01$, third bit flipped
+- $0 \to \begin{bmatrix} 0 \\ 0 \\ 0 \end{bmatrix}$, $1 \to \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$
+- encoding: $B^k \to B^n$, $k < n$
+- $[n, k]$-code
+- apply a matrix $P$ to find parity
+  - $P = \begin{bmatrix} 1 & 1 & 0 \\ 0 & p & 1 \end{bmatrix}$
+  - $P \begin{bmatrix} 0 \\ 0 \\ 0 \end{bmatrix} = P \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$
+- $s' = s + e$
+  - $e_1 = \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix}$, $e_2 = \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix}$, $e_3 = \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$
+  - cube representation
+  - $P(s') = P(s + e) = P(s) + P(e) = P(e)$,
+  - $P(e_1) = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$, $P(e_2) = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$
+- error syndrome $\to$ error
+  - $Q \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix}$, $Q \begin{bmatrix} 1 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix}$, $Q \begin{bmatrix} 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$
+  - $\text{received} + \text{fix} = s' + Q(P s') = s$
+- theorem: error detection is possible iff for all errors $e$, $P e \neq 0$
+- theorem: error correction is possible iff all $P e$ are different
+
+## hamming distance
+- weight of a bitstring $w \colon B^n \to \mathbb N$: $w(s) = \text{number of 1s in $s$}$
+- $d(s, t) = w(s - t) = w(s + t)$
+- $d$ is a metric
+  - $d(s, t) = 0$ iff $s = t$
+  - $d(s, t) = d(t, s)$
+  - $d(s, t) \leq d(s, x) + d(x, t)$
+- want $P G = 0$ with error syndrome that says "no error"
+- $d(G) = \min \left \{ d(s, t) : s, t \in G(B^k) \wedge s \neq t \right \} = \min \left \{ w(s) : s \in G(B^k) \wedge s \neq 0^n \right \}$
+- $[n, k, d(G)]$
+- assumption: $P(\text{bit flip}) = p$
+  - $P(\text{at least two bits flip}) = 3 \cdot p^2 (1 - p) + p^3 = 3 p^2 - 2 p^3$
+  - $3 p^2 - 2 p^3 < p \Leftrightarrow p (2 p^2 - 3 p + 1) > 0 \Leftrightarrow p < \frac{1}{2}$
+- there is a $[7, 4, 3]$ code
+- voyager 2 uses $[24, 12, 8]$ code
